@@ -1,0 +1,1 @@
+<resultMap>中的property即实现类中的对应的局部变量名称，column即指定的列名，与查询结果的列名一一对应
