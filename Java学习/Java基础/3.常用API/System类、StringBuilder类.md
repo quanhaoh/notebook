@@ -1,7 +1,8 @@
 ### System类
 #### 1、currentTimeMills()方法
 返回以毫秒为单位的当前时间，可用于测试程序的效率（程序执行前后分别获取）
-#### 2、arraycopy()方法
+#### 2、arracopy()方法
+
 将原数组的指定数据拷贝到另一个数组中
 
 ### 二、StringBuilder类
