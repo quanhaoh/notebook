@@ -182,7 +182,7 @@ int lastRet = -1; // 指向上一个返回的元素
 int expectedModCount = modCount;// 用于fail-fast机制，当二者不相等时，列表结构被修改，则抛出异常
 ```
 
-获取元素
+##### 获取元素
 
 ```java
 // 获取下一个元素
@@ -204,6 +204,27 @@ public E next() {
 final void checkForComodification() {
     if (modCount != expectedModCount)
         throw new ConcurrentModificationException();
+}
+```
+
+##### 安全删除元素：不会触发fail-fast机制
+
+```java
+public void remove() {
+    if (lastRet < 0)
+        throw new IllegalStateException();
+    checkForComodification();
+
+    try {
+        ArrayList.this.remove(lastRet);
+        // cursor、lastRet同步减1
+        cursor = lastRet;
+        lastRet = -1;
+        // 更新expectMoCount，防止触发fail-fast机制
+        expectedModCount = modCount;
+    } catch (IndexOutOfBoundsException ex) {
+        throw new ConcurrentModificationException();
+    }
 }
 ```
 
