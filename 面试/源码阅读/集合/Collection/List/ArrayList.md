@@ -1,5 +1,11 @@
 ## ArrayList
 
+### 重点
+
+ArrayList的实现基于动态数组，最常见的操作是扩容、数组复制
+
+ArrayList可以随机访问，但扩容、数组复制的资源消耗较大，比较适用于读多写少的情况
+
 ### 重要成员变量
 
 ```java
@@ -73,7 +79,7 @@ public ArrayList(Collection<? extends E> c) {
 }
 ```
 
-### 自动扩容、add
+### 自动扩容：add、addAll
 
 add方法中没有对添加的元素进行类型检验，因为elementData是Object类型的，可以添加任意类型元素，包括null值
 
@@ -91,7 +97,7 @@ add(int index, E e)
  * @return <tt>true</tt> (as specified by {@link Collection#add})
  */
 public boolean add(E e) {
-    // 扩容检查，
+    // 扩容检查,需要才进行扩容
     ensureCapacityInternal(size + 1);  // Increments modCount!!
     elementData[size++] = e;
     return true;
@@ -104,6 +110,8 @@ public boolean add(E e) {
 public void add(int index, E element) {
     // 检测index是否在数组范围内
     rangeCheckForAdd(index);
+    // size + 1为默认最小扩容量，刚好满足需求
+    // 如果是addAll方法，则最小扩容量为size + 插入元素数量
     ensureCapacityInternal(size + 1);  // Increments modCount!!
     // 将index后面的元素后移1位
     System.arraycopy(elementData, index, elementData, index + 1,
@@ -118,7 +126,7 @@ private void ensureCapacityInternal(int minCapacity) {
     ensureExplicitCapacity(calculateCapacity(elementData, minCapacity));
 }
 
-// 计算最小扩容量
+// 使用无参构造方法创建列表时，elementData即为DEFAULTCAPACITY_EMPTY_ELEMENTDATA空数组
 private static int calculateCapacity(Object[] elementData, int minCapacity) {
     // 设置扩容量为10（所谓的初始化大小为10是直到这里才实现）
     if (elementData == DEFAULTCAPACITY_EMPTY_ELEMENTDATA) {
@@ -138,7 +146,6 @@ private void ensureExplicitCapacity(int minCapacity) {
 
 private void grow(int minCapacity) {
         // overflow-conscious code
-		
         int oldCapacity = elementData.length;
     	// 设置新容量为旧容量的1.5倍
         int newCapacity = oldCapacity + (oldCapacity >> 1);
@@ -148,7 +155,7 @@ private void grow(int minCapacity) {
     	// 比较新容量和Integer最大值，最大只能扩容至Integer的最大值
         if (newCapacity - MAX_ARRAY_SIZE > 0)
             newCapacity = hugeCapacity(minCapacity);
-        // 扩容操作，即复制到一个更大的数组中
+        // 扩容操作，即复制到指定大小的数组中
         elementData = Arrays.copyOf(elementData, newCapacity);
 }
 
@@ -161,26 +168,92 @@ private static int hugeCapacity(int minCapacity) {
 }
 ```
 
-### 删除元素，remove
+### 迭代器：Interator
+
+在ArrayList定义了内部类Itr，实现了迭代器，维护了指向elementData的索引cursor、lastRet
+
+当遍历过程中列表结构被改变，索引并不会跟着改变，所以会抛出ConcurrentModificationException
+
+##### 重要成员变量
+
+```java
+int cursor;       // 指向下一个要返回的元素
+int lastRet = -1; // 指向上一个返回的元素
+int expectedModCount = modCount;// 用于fail-fast机制，当二者不相等时，列表结构被修改，则抛出异常
+```
+
+获取元素
+
+```java
+// 获取下一个元素
+@SuppressWarnings("unchecked")
+public E next() {
+    checkForComodification();
+    int i = cursor;
+    if (i >= size)
+        throw new NoSuchElementException();
+    Object[] elementData = ArrayList.this.elementData;
+    if (i >= elementData.length)
+        throw new ConcurrentModificationException();
+    // 将cursor指向下一个元素
+    cursor = i + 1;
+    // 返回当前元素
+    return (E) elementData[lastRet = i];
+}
+// fial-fast检测，当列表结构被修改（插入、删除）时，抛出异常
+final void checkForComodification() {
+    if (modCount != expectedModCount)
+        throw new ConcurrentModificationException();
+}
+```
+
+### 删除元素：remove、removeRange
 
 删除元素的原理和在add(index, element)的原理相同，都是移动元素（复制数组），时间复杂度都为O(n)
 
-删除元素，即遍历elementData，删除第一个与之相等的元素
+removeObject o)
+
+- 删除指定元素，遍历elementData，删除第一个与之相等的元素，挪动数组
+
+
+remove(int index)
+
+- 删除指定位置元素
+
+removeRange(int fromIndex, int toIndex)
+
+- 删除[fromIndex, toIndex - 1]间的元素
+
+```java
+public E remove(int index) {
+    rangeCheck(index);
+
+    modCount++;
+    E oldValue = elementData(index);
+	// 挪动数组即为删除，numMoved为需要挪动的元素个数
+    int numMoved = size - index - 1;
+    if (numMoved > 0)
+        System.arraycopy(elementData, index+1, elementData, index,
+                         numMoved);
+    // 将该位置赋为null，以便GC回收对象
+    elementData[--size] = null; // clear to let GC do its work
+
+    return oldValue;
+}
+```
 
 ### 序列化
 
-### 迭代器
-
 ### 其他常用方法
 
-| 方法       | 说明 |
-| ---------- | ---- |
-| set()      |      |
-| indexOf()  |      |
-| replace()  |      |
-| contains() |      |
-| size()     |      |
-| subList()  |      |
-| sort()     |      |
-| clone()    |      |
-
+| 方法                                     | 说明                                                         |
+| ---------------------------------------- | ------------------------------------------------------------ |
+| set(Object , int index)                  | 直接修改指定位置的元素                                       |
+| indexOf(Object o)、lastIndexOf(Object o) | 正序遍历获取第一个匹配的元素位置、<br />倒序遍历获取最后一个匹配的元素位置 |
+| contains(Object o)                       | return indexyOf(o) > 0                                       |
+| isEmpty()                                | rreturn size == 0                                            |
+| size()                                   | reyurn size                                                  |
+| sort()                                   | 调用Arrays.sort()进行快速排序                                |
+| subList(int fromIndex, int toIndex)      | 返回[fromIndex, toIndex - 1]的定长子列表，内部定义SubList类<br />效果和实现原理与Arrays的asList()类似 |
+| clone()                                  | 拷贝一个内容相同的新对象，先调用Object.clone()方法创建对象，再调用Arrays.copyOf()复制数组 |
+| clear()                                  | 清空列表，即遍历列表，为elmentData每个位置赋null             |
