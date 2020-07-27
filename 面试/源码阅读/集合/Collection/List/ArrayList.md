@@ -81,6 +81,8 @@ public ArrayList(Collection<? extends E> c) {
 
 ### 自动扩容：add、addAll
 
+ArrayList是插入元素前进行扩容检查，无参构造方法的扩容是直到插入第一个元素才进行
+
 add方法中没有对添加的元素进行类型检验，因为elementData是Object类型的，可以添加任意类型元素，包括null值
 
 add(E e)

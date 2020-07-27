@@ -10,6 +10,9 @@ tail指向数组下一个要插入的位置，因此ArrayDeque始终有一个空
 
 在对循环数组操作时，需要的注意的是：数组是否用完、数组下标越界
 
+- 处理数组下标越界的做法：利用与运算的方式，对下标求模，例如，(head - 1) & (elementData.length - 1)、(tail- 1) & (elementData.length - 1)
+- 将容量变为2的整数幂的做法：利用位运算求掩码，掩码加1即为大于该数的最小2的整数幂
+
 由于循环数组的特殊性，在插入时，不需要进行判空处理
 
 ### 重要成员变量
@@ -38,6 +41,8 @@ private static final int MIN_INITIAL_CAPACITY = 8;
 ```
 
 ### 构造方法
+
+ArrayDeque的扩容是先插入元素再尽心扩容，无参构造对象的容量在创建对象时就已经初始化好了
 
 ArrayDeque双向数组的大小一定是2的整数次幂，最小是8，最大是2^30次方（int类型只有32位）
 
@@ -172,5 +177,5 @@ public E getLast() {
 
 ### 其他方法
 
-![](https://gitee.com/quanhaoh/blogImage/raw/master/img/Queue和Deque接口的方法.png)
+<img src="https://gitee.com/quanhaoh/blogImage/raw/master/img/Queue和Deque接口的方法.png" style="zoom:;" />
 
