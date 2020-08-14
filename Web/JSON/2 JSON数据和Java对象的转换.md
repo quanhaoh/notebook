@@ -8,7 +8,7 @@
 
 使用步骤：
 
-1. 倒入jackjson的jar包
+1. 导入jackjson的jar包
 2. 创建JackJson核心对象：ObjectMapper
    - ObjectMapper mapper = new ObjectMapper();
 3. 调用ObjectMapper对象的方法进行转换，将JSON数据转换为特定对象
