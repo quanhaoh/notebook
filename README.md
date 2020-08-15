@@ -1,12 +1,12 @@
-## notebook -- CS学习的系列知识
+## notebook -- Java自学系列知识
 
 ![](https://img.shields.io/badge/version-v1.0.0-green.svg) ![](https://img.shields.io/badge/author-hong-yellow.svg) ![](https://img.shields.io/badge/license-GPL-blue.svg)
 
-目前正在不断更新、完善中... 
+项目起源于自学Java过程中所做的300+系列笔记，点点滴滴的积累成就了本项目的体系结构...
 
-在学习过程中记录、归纳、总结，希望可以给一些朋友提供想法和帮助
+随着我学习的不断深入，项目也在不断更新、完善中... 
 
-本项目也会随着我学习的深入而不断完善，也欢迎大家参与共建
+非常欢迎大家参与共建~~
 
 ### 关于作者
 
